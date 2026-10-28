@@ -1,0 +1,34 @@
+name: Daily Taiwan Stock Screener
+
+on:
+  schedule:
+    # 台灣時間週一至週五 15:30 (UTC 07:30)
+    - cron: '30 7 * * 1-5'
+  workflow_dispatch: # 支援手動一鍵點擊執行
+
+jobs:
+  screen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          pip install pandas numpy yfinance requests lxml
+
+      - name: Run Full-Market Screener
+        run: |
+          python screener.py
+
+      - name: Commit and Push Results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/data.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update daily screener results [skip ci]" && git push)
