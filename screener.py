@@ -6,7 +6,8 @@
 - 輸出: 自動生成 docs/data.json，直供 GitHub Pages 儀表板呈現
 """
 
-from datetime import datetime, timezone, timedeltaimport json
+from datetime import datetime, timezone, timedelta
+import json
 import io
 import os
 import re
