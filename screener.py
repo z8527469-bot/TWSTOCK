@@ -8,6 +8,7 @@
 
 from datetime import datetime
 import json
+import io
 import os
 import re
 import time
@@ -55,7 +56,7 @@ def fetch_tw_stock_universe() -> Dict[str, str]:
     try:
       resp = requests.get(url, headers=headers, timeout=15)
       resp.encoding = "big5-hkscs"
-      dfs = pd.read_html(resp.text)
+      dfs = pd.read_html(io.StringIO(resp.text))
       if not dfs:
         continue
 
