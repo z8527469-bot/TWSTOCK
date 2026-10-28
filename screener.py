@@ -6,8 +6,7 @@
 - 輸出: 自動生成 docs/data.json，直供 GitHub Pages 儀表板呈現
 """
 
-from datetime import datetime
-import json
+from datetime import datetime, timezone, timedeltaimport json
 import io
 import os
 import re
@@ -355,23 +354,54 @@ def run_full_market_screener() -> List[dict]:
   return matched_results
 
 
-# ==================== 5. 輸出 JSON 供 GitHub Pages 使用 ====================
+# ==================== 5. 輸出 JSON 與自動維護歷史存檔 ====================
 def save_output(results: List[dict]):
+  # 設定台灣時間 (UTC+8)
+  tz_tw = timezone(timedelta(hours=8))
+  now = datetime.now(tz_tw)
+  date_str = now.strftime("%Y-%m-%d")
+  updated_str = now.strftime("%Y-%m-%d %H:%M:%S (CST)")
+
+  # 建立目錄架構
   os.makedirs(OUTPUT_DIR, exist_ok=True)
+  history_dir = os.path.join(OUTPUT_DIR, "history")
+  os.makedirs(history_dir, exist_ok=True)
 
   payload = {
-      "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S (CST)"),
+      "updated_at": updated_str,
       "total_scanned": len(results),
       "results": results,
   }
 
+  # 1. 寫入最新覆寫檔 (供首頁預設讀取)
   with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
     json.dump(payload, f, ensure_ascii=False, indent=2)
 
+  # 2. 寫入每日歷史存檔 (例如: docs/history/2026-10-28.json)
+  history_file = os.path.join(history_dir, f"{date_str}.json")
+  with open(history_file, "w", encoding="utf-8") as f:
+    json.dump(payload, f, ensure_ascii=False, indent=2)
+
+  # 3. 更新歷史目錄清單 (供網頁下拉選單讀取)
+  index_file = os.path.join(history_dir, "index.json")
+  available_dates = []
+  
+  if os.path.exists(index_file):
+    try:
+      with open(index_file, "r", encoding="utf-8") as f:
+        available_dates = json.load(f)
+    except Exception:
+      pass
+
+  # 將新日期加入並由新到舊排序
+  if date_str not in available_dates:
+    available_dates.append(date_str)
+    
+  available_dates.sort(reverse=True)
+
+  with open(index_file, "w", encoding="utf-8") as f:
+    json.dump(available_dates, f, ensure_ascii=False, indent=2)
+
   print(f"\n🎉 全市場掃描完成！符合條件標的共 {len(results)} 檔。")
-  print(f"📁 結果已自動儲存至: {OUTPUT_FILE}")
-
-
-if __name__ == "__main__":
-  results = run_full_market_screener()
-  save_output(results)
+  print(f"📁 最新結果已儲存至: {OUTPUT_FILE}")
+  print(f"🗄️ 歷史紀錄已歸檔至: {history_file}")
