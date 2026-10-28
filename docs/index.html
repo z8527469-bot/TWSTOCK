@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>台股波段量化選股終端 (TW Full-Market Screener)</title>
+  <style>
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-card: #111827;
+      --bg-card-hover: #1f2937;
+      --border-color: #374151;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --tw-up: #ef4444;     /* 台股漲/突破：紅色 */
+      --tw-down: #10b981;   /* 台股跌/防守：綠色 */
+      --accent-blue: #3b82f6;
+      --accent-purple: #8b5cf6;
+      --accent-amber: #f59e0b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Noto Sans TC", sans-serif;
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+
+    .container { max-width: 1300px; margin: 0 auto; }
+
+    /* Header & Stats */
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 1.5rem;
+    }
+    .header-title h1 { font-size: 1.6rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+    .header-title p { color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem; }
+    .status-badge {
+      font-size: 0.75rem;
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+    }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    .stat-card .label { font-size: 0.8rem; color: var(--text-muted); }
+    .stat-card .value { font-size: 1.4rem; font-weight: 700; margin-top: 0.25rem; }
+
+    /* Controls & Filter Bar */
+    .controls-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .tabs-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .tab-btn {
+      background: #1f2937;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.45rem 0.9rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: var(--accent-blue);
+      color: #fff;
+      border-color: var(--accent-blue);
+    }
+    .search-sort-group { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+    .input-field, .select-field {
+      background: #1f2937;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.45rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      outline: none;
+    }
+    .input-field:focus, .select-field:focus { border-color: var(--accent-blue); }
+
+    /* Table / Grid */
+    .table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+    thead tr { background: #1a2234; border-bottom: 1px solid var(--border-color); }
+    th, td { padding: 0.85rem 1rem; white-space: nowrap; }
+    th { color: var(--text-muted); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.05em; }
+    tbody tr { border-bottom: 1px solid rgba(55, 65, 81, 0.5); transition: background 0.15s; }
+    tbody tr:hover { background: var(--bg-card-hover); }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-right: 0.25rem;
+    }
+    .badge-vcp { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .badge-pullback { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .badge-reversal { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+
+    .sparkline-svg { vertical-align: middle; }
+    .action-btn {
+      background: #1f2937;
+      color: #93c5fd;
+      border: 1px solid #3b82f6;
+      border-radius: 4px;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .action-btn:hover { background: #2563eb; color: #fff; }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      display: none; justify-content: center; align-items: center; z-index: 100;
+    }
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      width: 90%; max-width: 480px; padding: 1.5rem;
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .modal-close { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+    .form-group input { width: 100%; }
+
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <header>
+    <div class="header-title">
+      <h1>📈 台股波段純多頭量化選股終端</h1>
+      <p>涵蓋 TWSE / TPEx 全市場 1,800+ 標的 | 鎖定 VCP 突破、強勢回測、底部扭轉三大策略</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+      <span class="status-badge" id="updateTimeBadge">載入中...</span>
+      <button class="action-btn" onclick="exportCSV()">匯出 CSV</button>
+    </div>
+  </header>
+
+  <!-- Summary Stats -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="label">全市場入選標的</div>
+      <div class="value" id="totalCandidates">-</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">VCP 壓縮突破</div>
+      <div class="value" style="color: #f87171;" id="countVCP">-</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">強勢股回後買</div>
+      <div class="value" style="color: #60a5fa;" id="countPullback">-</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">底部底底高扭轉</div>
+      <div class="value" style="color: #fbbf24;" id="countReversal">-</div>
+    </div>
+  </div>
+
+  <!-- Filter & Search Toolbar -->
+  <div class="controls-panel">
+    <div class="tabs-group" id="strategyTabs">
+      <button class="tab-btn active" data-filter="ALL">全部策略</button>
+      <button class="tab-btn" data-filter="VCP_BREAKOUT">🔥 VCP 突破</button>
+      <button class="tab-btn" data-filter="PULLBACK_BUY">🎯 回測月線買</button>
+      <button class="tab-btn" data-filter="BOTTOM_REVERSAL">⚡ 底部翻揚</button>
+    </div>
+
+    <div class="search-sort-group">
+      <input type="text" id="searchInput" class="input-field" placeholder="搜尋代碼或股名 (如: 2330 / 汎銓)...">
+      <select id="sortSelect" class="select-field">
+        <option value="vol_desc">成交量 (大至小)</option>
+        <option value="price_desc">收盤價 (高至低)</option>
+        <option value="price_asc">收盤價 (低至高)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>標的代碼 / 名稱</th>
+          <th>收盤價</th>
+          <th>成交量 (張)</th>
+          <th>符合策略</th>
+          <th>關鍵觀察位階 / 樞紐</th>
+          <th>建議防守停損</th>
+          <th>近 15 日走勢</th>
+          <th>風控計算</th>
+        </tr>
+      </thead>
+      <tbody id="screenerTableBody">
+        <tr><td colspan="8" class="empty-state">資料載入中，請稍候...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Risk & Position Calculator Modal -->
+<div class="modal-overlay" id="calcModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="calcModalTitle">部位風控計算機</h3>
+      <button class="modal-close" onclick="closeCalcModal()">&times;</button>
+    </div>
+    <div class="form-group">
+      <label>總投資本金 (NTD)</label>
+      <input type="number" id="calcAccountSize" class="input-field" value="1000000" step="50000">
+    </div>
+    <div class="form-group">
+      <label>單筆交易最大容忍虧損比例 (%)</label>
+      <input type="number" id="calcRiskPercent" class="input-field" value="1.0" step="0.1">
+    </div>
+    <div class="form-group">
+      <label>買進價格 (NTD)</label>
+      <input type="number" id="calcEntryPrice" class="input-field">
+    </div>
+    <div class="form-group">
+      <label>停損價格 (NTD)</label>
+      <input type="number" id="calcStopLoss" class="input-field">
+    </div>
+
+    <div style="background: #1a2234; padding: 1rem; border-radius: 6px; margin-top: 1rem;">
+      <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.3rem;">單筆最大承受損失: <b id="calcMaxLoss" style="color: #ef4444;">-</b></div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.3rem;">每股潛在風險: <b id="calcRiskPerShare">-</b></div>
+      <div style="font-size: 1rem; color: #60a5fa; margin-top: 0.5rem; font-weight: 700;">建議購買股數: <span id="calcSuggestedShares">-</span> 股 (<span id="calcSuggestedLots">-</span> 張)</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let rawData = [];
+  let currentFilter = "ALL";
+
+  // 1. 本地預覽擬真回退資料 (若尚未產生 data.json 或由本地檔案協議 file:// 開啟時使用)
+  const FALLBACK_DATA = {
+    updated_at: "2026-10-28 15:30:00 (CST) [預覽資料]",
+    total_scanned: 1845,
+    results: [
+      {
+        ticker: "6830.TWO",
+        name: "汎銓",
+        close: 188.5,
+        volume: 3820,
+        strategies: ["VCP_BREAKOUT"],
+        vcp: { pivot_point: 182.0, breakout_ratio: 3.57, volume_surge_ratio: 2.1, stop_loss: 174.5 },
+        chart_history: [168, 172, 170, 174, 173, 175, 176, 175, 176, 177, 178, 177, 179, 182, 188.5]
+      },
+      {
+        ticker: "8358.TWO",
+        name: "金居",
+        close: 68.2,
+        volume: 12450,
+        strategies: ["PULLBACK_BUY"],
+        pullback: { support_ma20: 66.8, pullback_ratio: 6.2, stop_loss: 64.5 },
+        chart_history: [62, 64, 66, 71, 73, 72, 70, 68, 67, 66.5, 66.8, 67.2, 68.2]
+      },
+      {
+        ticker: "1519.TW",
+        name: "華城",
+        close: 695.0,
+        volume: 4890,
+        strategies: ["VCP_BREAKOUT", "BOTTOM_REVERSAL"],
+        vcp: { pivot_point: 680.0, breakout_ratio: 2.2, volume_surge_ratio: 1.8, stop_loss: 652.0 },
+        reversal: { ma60_level: 672.0, recent_trough: 645.0, stop_loss: 632.0 },
+        chart_history: [640, 645, 650, 648, 655, 660, 658, 662, 665, 668, 670, 675, 680, 695]
+      }
+    ]
+  };
+
+  // 2. 初始化資料載入
+  async function loadData() {
+    try {
+      const response = await fetch('./data.json?t=' + Date.now());
+      if (!response.ok) throw new Error("HTTP error " + response.status);
+      const data = await response.json();
+      initDashboard(data);
+    } catch (e) {
+      console.warn("未能在 ./data.json 取得資料，切換至擬真展示資料模式：", e);
+      initDashboard(FALLBACK_DATA);
+    }
+  }
+
+  function initDashboard(data) {
+    document.getElementById("updateTimeBadge").textContent = "更新時間: " + (data.updated_at || "即時");
+    rawData = data.results || [];
+
+    // 計算儀表板頂部統計指標
+    document.getElementById("totalCandidates").textContent = rawData.length + " 檔";
+    document.getElementById("countVCP").textContent = rawData.filter(d => d.strategies.includes("VCP_BREAKOUT")).length;
+    document.getElementById("countPullback").textContent = rawData.filter(d => d.strategies.includes("PULLBACK_BUY")).length;
+    document.getElementById("countReversal").textContent = rawData.filter(d => d.strategies.includes("BOTTOM_REVERSAL")).length;
+
+    renderTable();
+  }
+
+  // 3. 繪製微型走勢圖 (SVG Sparkline)
+  function generateSparkline(prices) {
+    if (!prices || prices.length < 2) return "-";
+    const width = 110;
+    const height = 30;
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+    const range = (max - min) === 0 ? 1 : (max - min);
+
+    const points = prices.map((p, idx) => {
+      const x = (idx / (prices.length - 1)) * width;
+      const y = height - ((p - min) / range) * (height - 6) - 3;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(" ");
+
+    const isUp = prices[prices.length - 1] >= prices[0];
+    const strokeColor = isUp ? "#ef4444" : "#10b981"; // 台股慣例：漲紅跌綠
+
+    return `
+      <svg class="sparkline-svg" width="${width}" height="${height}">
+        <polyline fill="none" stroke="${strokeColor}" stroke-width="2" points="${points}" />
+      </svg>
+    `;
+  }
+
+  // 4. 表格渲染與篩選
+  function renderTable() {
+    const tbody = document.getElementById("screenerTableBody");
+    const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+    const sortVal = document.getElementById("sortSelect").value;
+
+    let filtered = rawData.filter(item => {
+      const matchStrat = (currentFilter === "ALL") || item.strategies.includes(currentFilter);
+      const matchSearch = (!keyword) || 
+                          item.ticker.toLowerCase().includes(keyword) || 
+                          (item.name && item.name.toLowerCase().includes(keyword));
+      return matchStrat && matchSearch;
+    });
+
+    // 排序
+    if (sortVal === "vol_desc") filtered.sort((a, b) => b.volume - a.volume);
+    if (sortVal === "price_desc") filtered.sort((a, b) => b.close - a.close);
+    if (sortVal === "price_asc") filtered.sort((a, b) => a.close - b.close);
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" class="empty-state">無符合條件之標的</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(item => {
+      // 策略標籤
+      const badges = item.strategies.map(s => {
+        if (s === "VCP_BREAKOUT") return `<span class="badge badge-vcp">VCP突破</span>`;
+        if (s === "PULLBACK_BUY") return `<span class="badge badge-pullback">拉回買進</span>`;
+        if (s === "BOTTOM_REVERSAL") return `<span class="badge badge-reversal">底部扭轉</span>`;
+        return "";
+      }).join("");
+
+      // 提取停損與關鍵位階
+      let pivotText = "-";
+      let stopLoss = "-";
+
+      if (item.vcp) {
+        pivotText = `樞紐: <b>${item.vcp.pivot_point}</b> (+${item.vcp.breakout_ratio}%)`;
+        stopLoss = item.vcp.stop_loss;
+      } else if (item.pullback) {
+        pivotText = `月線: <b>${item.pullback.support_ma20}</b> (回檔 ${item.pullback.pullback_ratio}%)`;
+        stopLoss = item.pullback.stop_loss;
+      } else if (item.reversal) {
+        pivotText = `季線: <b>${item.reversal.ma60_level}</b>`;
+        stopLoss = item.reversal.stop_loss;
+      }
+
+      return `
+        <tr>
+          <td>
+            <div style="font-weight: 700; color: #fff;">${item.name || ''}</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">${item.ticker}</div>
+          </td>
+          <td style="font-weight: 700; color: #f87171;">${item.close.toFixed(2)}</td>
+          <td>${item.volume.toLocaleString()}</td>
+          <td>${badges}</td>
+          <td>${pivotText}</td>
+          <td style="color: #10b981; font-weight: 600;">${stopLoss}</td>
+          <td>${generateSparkline(item.chart_history)}</td>
+          <td>
+            <button class="action-btn" onclick="openCalcModal('${item.ticker}', '${item.name}', ${item.close}, ${stopLoss !== '-' ? stopLoss : (item.close * 0.95).toFixed(2)})">
+              部位試算
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  // 5. 事件監聽 (分頁切換、搜尋、排序)
+  document.getElementById("strategyTabs").addEventListener("click", e => {
+    if (e.target.classList.contains("tab-btn")) {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      e.target.classList.add("active");
+      currentFilter = e.target.getAttribute("data-filter");
+      renderTable();
+    }
+  });
+
+  document.getElementById("searchInput").addEventListener("input", renderTable);
+  document.getElementById("sortSelect").addEventListener("change", renderTable);
+
+  // 6. 部位風控計算機
+  function openCalcModal(ticker, name, closePrice, stopLoss) {
+    document.getElementById("calcModalTitle").textContent = `部位風控計算 (${ticker} ${name})`;
+    document.getElementById("calcEntryPrice").value = closePrice;
+    document.getElementById("calcStopLoss").value = stopLoss;
+    calculateRisk();
+    document.getElementById("calcModal").style.display = "flex";
+  }
+
+  function closeCalcModal() {
+    document.getElementById("calcModal").style.display = "none";
+  }
+
+  function calculateRisk() {
+    const capital = parseFloat(document.getElementById("calcAccountSize").value) || 0;
+    const riskPct = parseFloat(document.getElementById("calcRiskPercent").value) || 1;
+    const entry = parseFloat(document.getElementById("calcEntryPrice").value) || 0;
+    const stop = parseFloat(document.getElementById("calcStopLoss").value) || 0;
+
+    const maxLoss = capital * (riskPct / 100);
+    const riskPerShare = Math.max(0.01, entry - stop);
+    const shares = Math.floor(maxLoss / riskPerShare);
+    const lots = (shares / 1000).toFixed(2);
+
+    document.getElementById("calcMaxLoss").textContent = `NT$ ${Math.round(maxLoss).toLocaleString()}`;
+    document.getElementById("calcRiskPerShare").textContent = `NT$ ${riskPerShare.toFixed(2)}`;
+    document.getElementById("calcSuggestedShares").textContent = shares.toLocaleString();
+    document.getElementById("calcSuggestedLots").textContent = lots;
+  }
+
+  ["calcAccountSize", "calcRiskPercent", "calcEntryPrice", "calcStopLoss"].forEach(id => {
+    document.getElementById(id).addEventListener("input", calculateRisk);
+  });
+
+  // 7. CSV 匯出功能
+  function exportCSV() {
+    if (!rawData || rawData.length === 0) return alert("目前無資料可供匯出");
+    let csv = "代碼,名稱,收盤價,成交量(張),觸發策略\n";
+    rawData.forEach(r => {
+      csv += `${r.ticker},${r.name || ''},${r.close},${r.volume},"${r.strategies.join(';')}"\n`;
+    });
+    const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `TW_Screener_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // 啟動
+  loadData();
+</script>
+</body>
+</html>
