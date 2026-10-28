@@ -15,8 +15,6 @@
       --tw-up: #ef4444;     /* 台股漲/突破：紅色 */
       --tw-down: #10b981;   /* 台股跌/防守：綠色 */
       --accent-blue: #3b82f6;
-      --accent-purple: #8b5cf6;
-      --accent-amber: #f59e0b;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -122,7 +120,7 @@
     tbody tr { border-bottom: 1px solid rgba(55, 65, 81, 0.5); transition: background 0.15s; }
     tbody tr:hover { background: var(--bg-card-hover); }
 
-    /* Badges */
+    /* Badges & Links */
     .badge {
       display: inline-block;
       font-size: 0.75rem;
@@ -134,6 +132,20 @@
     .badge-vcp { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
     .badge-pullback { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
     .badge-reversal { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+
+    /* External Links Badge */
+    .ext-link {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 600;
+      opacity: 0.85;
+      transition: opacity 0.2s;
+    }
+    .ext-link:hover { opacity: 1; }
+    .tv-link { background: #2962ff; color: #fff; }
+    .pyr-link { background: #d97706; color: #fff; }
 
     .sparkline-svg { vertical-align: middle; }
     .action-btn {
@@ -279,7 +291,6 @@
   let rawData = [];
   let currentFilter = "ALL";
 
-  // 1. 本地預覽擬真回退資料 (若尚未產生 data.json 或由本地檔案協議 file:// 開啟時使用)
   const FALLBACK_DATA = {
     updated_at: "2026-10-28 15:30:00 (CST) [預覽資料]",
     total_scanned: 1845,
@@ -294,28 +305,17 @@
         chart_history: [168, 172, 170, 174, 173, 175, 176, 175, 176, 177, 178, 177, 179, 182, 188.5]
       },
       {
-        ticker: "8358.TWO",
-        name: "金居",
-        close: 68.2,
-        volume: 12450,
+        ticker: "2330.TW",
+        name: "台積電",
+        close: 1050.0,
+        volume: 48900,
         strategies: ["PULLBACK_BUY"],
-        pullback: { support_ma20: 66.8, pullback_ratio: 6.2, stop_loss: 64.5 },
-        chart_history: [62, 64, 66, 71, 73, 72, 70, 68, 67, 66.5, 66.8, 67.2, 68.2]
-      },
-      {
-        ticker: "1519.TW",
-        name: "華城",
-        close: 695.0,
-        volume: 4890,
-        strategies: ["VCP_BREAKOUT", "BOTTOM_REVERSAL"],
-        vcp: { pivot_point: 680.0, breakout_ratio: 2.2, volume_surge_ratio: 1.8, stop_loss: 652.0 },
-        reversal: { ma60_level: 672.0, recent_trough: 645.0, stop_loss: 632.0 },
-        chart_history: [640, 645, 650, 648, 655, 660, 658, 662, 665, 668, 670, 675, 680, 695]
+        pullback: { support_ma20: 1030.0, pullback_ratio: 2.1, stop_loss: 1010.0 },
+        chart_history: [980, 990, 1000, 1010, 1030, 1050, 1070, 1080, 1060, 1040, 1020, 1030, 1050]
       }
     ]
   };
 
-  // 2. 初始化資料載入
   async function loadData() {
     try {
       const response = await fetch('./data.json?t=' + Date.now());
@@ -331,42 +331,22 @@
   function initDashboard(data) {
     document.getElementById("updateTimeBadge").textContent = "更新時間: " + (data.updated_at || "即時");
     rawData = data.results || [];
-
-    // 計算儀表板頂部統計指標
     document.getElementById("totalCandidates").textContent = rawData.length + " 檔";
     document.getElementById("countVCP").textContent = rawData.filter(d => d.strategies.includes("VCP_BREAKOUT")).length;
     document.getElementById("countPullback").textContent = rawData.filter(d => d.strategies.includes("PULLBACK_BUY")).length;
     document.getElementById("countReversal").textContent = rawData.filter(d => d.strategies.includes("BOTTOM_REVERSAL")).length;
-
     renderTable();
   }
 
-  // 3. 繪製微型走勢圖 (SVG Sparkline)
   function generateSparkline(prices) {
     if (!prices || prices.length < 2) return "-";
-    const width = 110;
-    const height = 30;
-    const min = Math.min(...prices);
-    const max = Math.max(...prices);
+    const width = 110, height = 30;
+    const min = Math.min(...prices), max = Math.max(...prices);
     const range = (max - min) === 0 ? 1 : (max - min);
-
-    const points = prices.map((p, idx) => {
-      const x = (idx / (prices.length - 1)) * width;
-      const y = height - ((p - min) / range) * (height - 6) - 3;
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    }).join(" ");
-
-    const isUp = prices[prices.length - 1] >= prices[0];
-    const strokeColor = isUp ? "#ef4444" : "#10b981"; // 台股慣例：漲紅跌綠
-
-    return `
-      <svg class="sparkline-svg" width="${width}" height="${height}">
-        <polyline fill="none" stroke="${strokeColor}" stroke-width="2" points="${points}" />
-      </svg>
-    `;
+    const points = prices.map((p, idx) => `${(idx / (prices.length - 1)) * width},${height - ((p - min) / range) * (height - 6) - 3}`).join(" ");
+    return `<svg class="sparkline-svg" width="${width}" height="${height}"><polyline fill="none" stroke="${prices[prices.length - 1] >= prices[0] ? "#ef4444" : "#10b981"}" stroke-width="2" points="${points}" /></svg>`;
   }
 
-  // 4. 表格渲染與篩選
   function renderTable() {
     const tbody = document.getElementById("screenerTableBody");
     const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
@@ -374,13 +354,10 @@
 
     let filtered = rawData.filter(item => {
       const matchStrat = (currentFilter === "ALL") || item.strategies.includes(currentFilter);
-      const matchSearch = (!keyword) || 
-                          item.ticker.toLowerCase().includes(keyword) || 
-                          (item.name && item.name.toLowerCase().includes(keyword));
+      const matchSearch = (!keyword) || item.ticker.toLowerCase().includes(keyword) || (item.name && item.name.toLowerCase().includes(keyword));
       return matchStrat && matchSearch;
     });
 
-    // 排序
     if (sortVal === "vol_desc") filtered.sort((a, b) => b.volume - a.volume);
     if (sortVal === "price_desc") filtered.sort((a, b) => b.close - a.close);
     if (sortVal === "price_asc") filtered.sort((a, b) => a.close - b.close);
@@ -391,7 +368,6 @@
     }
 
     tbody.innerHTML = filtered.map(item => {
-      // 策略標籤
       const badges = item.strategies.map(s => {
         if (s === "VCP_BREAKOUT") return `<span class="badge badge-vcp">VCP突破</span>`;
         if (s === "PULLBACK_BUY") return `<span class="badge badge-pullback">拉回買進</span>`;
@@ -399,26 +375,28 @@
         return "";
       }).join("");
 
-      // 提取停損與關鍵位階
-      let pivotText = "-";
-      let stopLoss = "-";
+      let pivotText = "-", stopLoss = "-";
+      if (item.vcp) { pivotText = `樞紐: <b>${item.vcp.pivot_point}</b> (+${item.vcp.breakout_ratio}%)`; stopLoss = item.vcp.stop_loss; } 
+      else if (item.pullback) { pivotText = `月線: <b>${item.pullback.support_ma20}</b> (回檔 ${item.pullback.pullback_ratio}%)`; stopLoss = item.pullback.stop_loss; } 
+      else if (item.reversal) { pivotText = `季線: <b>${item.reversal.ma60_level}</b>`; stopLoss = item.reversal.stop_loss; }
 
-      if (item.vcp) {
-        pivotText = `樞紐: <b>${item.vcp.pivot_point}</b> (+${item.vcp.breakout_ratio}%)`;
-        stopLoss = item.vcp.stop_loss;
-      } else if (item.pullback) {
-        pivotText = `月線: <b>${item.pullback.support_ma20}</b> (回檔 ${item.pullback.pullback_ratio}%)`;
-        stopLoss = item.pullback.stop_loss;
-      } else if (item.reversal) {
-        pivotText = `季線: <b>${item.reversal.ma60_level}</b>`;
-        stopLoss = item.reversal.stop_loss;
-      }
+      // 提取股票代碼與市場後綴供外部連結使用
+      const tickerParts = item.ticker.split('.');
+      const code = tickerParts[0];
+      const market = tickerParts.length > 1 && tickerParts[1] === 'TWO' ? 'TPEX' : 'TWSE';
+      
+      const tvUrl = `https://tw.tradingview.com/chart/?symbol=${market}%3A${code}`;
+      const pyramidUrl = `https://norway.twsthr.info/StockHolders.aspx?stock=${code}`;
 
       return `
         <tr>
           <td>
-            <div style="font-weight: 700; color: #fff;">${item.name || ''}</div>
-            <div style="font-size: 0.78rem; color: var(--text-muted);">${item.ticker}</div>
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span style="font-weight: 700; color: #fff; font-size: 1.05rem;">${item.name || ''}</span>
+              <a href="${tvUrl}" target="_blank" class="ext-link tv-link" title="在 TradingView 開啟技術線圖">TV</a>
+              <a href="${pyramidUrl}" target="_blank" class="ext-link pyr-link" title="在 神秘金字塔 查詢大戶籌碼">籌碼</a>
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">${item.ticker}</div>
           </td>
           <td style="font-weight: 700; color: #f87171;">${item.close.toFixed(2)}</td>
           <td>${item.volume.toLocaleString()}</td>
@@ -427,16 +405,13 @@
           <td style="color: #10b981; font-weight: 600;">${stopLoss}</td>
           <td>${generateSparkline(item.chart_history)}</td>
           <td>
-            <button class="action-btn" onclick="openCalcModal('${item.ticker}', '${item.name}', ${item.close}, ${stopLoss !== '-' ? stopLoss : (item.close * 0.95).toFixed(2)})">
-              部位試算
-            </button>
+            <button class="action-btn" onclick="openCalcModal('${item.ticker}', '${item.name}', ${item.close}, ${stopLoss !== '-' ? stopLoss : (item.close * 0.95).toFixed(2)})">部位試算</button>
           </td>
         </tr>
       `;
     }).join("");
   }
 
-  // 5. 事件監聽 (分頁切換、搜尋、排序)
   document.getElementById("strategyTabs").addEventListener("click", e => {
     if (e.target.classList.contains("tab-btn")) {
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
@@ -449,7 +424,6 @@
   document.getElementById("searchInput").addEventListener("input", renderTable);
   document.getElementById("sortSelect").addEventListener("change", renderTable);
 
-  // 6. 部位風控計算機
   function openCalcModal(ticker, name, closePrice, stopLoss) {
     document.getElementById("calcModalTitle").textContent = `部位風控計算 (${ticker} ${name})`;
     document.getElementById("calcEntryPrice").value = closePrice;
@@ -458,49 +432,22 @@
     document.getElementById("calcModal").style.display = "flex";
   }
 
-  function closeCalcModal() {
-    document.getElementById("calcModal").style.display = "none";
-  }
+  function closeCalcModal() { document.getElementById("calcModal").style.display = "none"; }
 
   function calculateRisk() {
     const capital = parseFloat(document.getElementById("calcAccountSize").value) || 0;
     const riskPct = parseFloat(document.getElementById("calcRiskPercent").value) || 1;
     const entry = parseFloat(document.getElementById("calcEntryPrice").value) || 0;
     const stop = parseFloat(document.getElementById("calcStopLoss").value) || 0;
-
     const maxLoss = capital * (riskPct / 100);
     const riskPerShare = Math.max(0.01, entry - stop);
     const shares = Math.floor(maxLoss / riskPerShare);
-    const lots = (shares / 1000).toFixed(2);
 
     document.getElementById("calcMaxLoss").textContent = `NT$ ${Math.round(maxLoss).toLocaleString()}`;
     document.getElementById("calcRiskPerShare").textContent = `NT$ ${riskPerShare.toFixed(2)}`;
     document.getElementById("calcSuggestedShares").textContent = shares.toLocaleString();
-    document.getElementById("calcSuggestedLots").textContent = lots;
+    document.getElementById("calcSuggestedLots").textContent = (shares / 1000).toFixed(2);
   }
 
   ["calcAccountSize", "calcRiskPercent", "calcEntryPrice", "calcStopLoss"].forEach(id => {
     document.getElementById(id).addEventListener("input", calculateRisk);
-  });
-
-  // 7. CSV 匯出功能
-  function exportCSV() {
-    if (!rawData || rawData.length === 0) return alert("目前無資料可供匯出");
-    let csv = "代碼,名稱,收盤價,成交量(張),觸發策略\n";
-    rawData.forEach(r => {
-      csv += `${r.ticker},${r.name || ''},${r.close},${r.volume},"${r.strategies.join(';')}"\n`;
-    });
-    const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `TW_Screener_${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  // 啟動
-  loadData();
-</script>
-</body>
-</html>
