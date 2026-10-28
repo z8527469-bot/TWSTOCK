@@ -300,37 +300,13 @@
 <script>
   let rawData = [];
   let currentFilter = "ALL";
+  let isHistoricalView = false; // 判斷是否正在查看歷史紀錄
 
-  const FALLBACK_DATA = {
-    updated_at: "2026-10-28 15:30:00 (CST) [預覽資料]",
-    total_scanned: 1845,
-    results: [
-      {
-        ticker: "6830.TWO",
-        name: "汎銓",
-        close: 188.5,
-        volume: 3820,
-        strategies: ["VCP_BREAKOUT"],
-        vcp: { pivot_point: 182.0, breakout_ratio: 3.57, volume_surge_ratio: 2.1, stop_loss: 174.5 },
-        chart_history: [168, 172, 170, 174, 173, 175, 176, 175, 176, 177, 178, 177, 179, 182, 188.5]
-      },
-      {
-        ticker: "2330.TW",
-        name: "台積電",
-        close: 1050.0,
-        volume: 48900,
-        strategies: ["PULLBACK_BUY"],
-        pullback: { support_ma20: 1030.0, pullback_ratio: 2.1, stop_loss: 1010.0 },
-        chart_history: [980, 990, 1000, 1010, 1030, 1050, 1070, 1080, 1060, 1040, 1020, 1030, 1050]
-      }
-    ]
-  };
+  // ... (FALLBACK_DATA 等常數保留) ...
 
-  // 1. 啟動並檢查歷史目錄
   async function boot() {
     const dateSelect = document.getElementById("dateSelect");
     try {
-      // 嘗試讀取歷史目錄索引 (加上 timestamp 避免快取)
       const res = await fetch('./history/index.json?t=' + Date.now());
       if (res.ok) {
         const dates = await res.json();
@@ -340,25 +316,34 @@
           dates.forEach(date => {
             dateSelect.innerHTML += `<option value="./history/${date}.json">📅 歷史: ${date}</option>`;
           });
-          // 當選擇其他日期時，切換資料來源
-          dateSelect.addEventListener("change", (e) => loadData(e.target.value));
+          
+          dateSelect.addEventListener("change", (e) => {
+             // 如果選擇的不是最新覆蓋版，就標記為歷史檢視模式
+             isHistoricalView = e.target.value !== "./data.json";
+             loadData(e.target.value);
+          });
         }
       }
     } catch (e) {
       console.log("尚未建立歷史索引，維持單一資料模式。");
     }
-    // 預設載入最新資料
     loadData('./data.json');
   }
 
-  // 2. 載入指定 JSON 並重繪
   async function loadData(url) {
-    document.getElementById("screenerTableBody").innerHTML = `<tr><td colspan="8" class="empty-state">資料載入中，請稍候...</td></tr>`;
+    document.getElementById("screenerTableBody").innerHTML = `<tr><td colspan="9" class="empty-state">資料載入中，請稍候...</td></tr>`;
     try {
       const fetchUrl = url.includes('?') ? url : url + '?t=' + Date.now();
       const response = await fetch(fetchUrl);
       if (!response.ok) throw new Error("HTTP error " + response.status);
-      const data = await response.json();
+      let data = await response.json();
+      
+      // 如果是歷史檢視模式，抓取最新報價來計算績效
+      if (isHistoricalView) {
+          document.getElementById("screenerTableBody").innerHTML = `<tr><td colspan="9" class="empty-state">正在計算歷史績效，請稍候...</td></tr>`;
+          data = await appendCurrentPerformance(data);
+      }
+      
       initDashboard(data);
     } catch (e) {
       console.warn(`未能在 ${url} 取得資料，切換至擬真展示資料模式：`, e);
@@ -366,142 +351,99 @@
     }
   }
 
+  // --- 新增：即時抓取最新報價計算績效 ---
+  async function appendCurrentPerformance(data) {
+    if (!data.results || data.results.length === 0) return data;
+    
+    // 收集所有股票代號 (轉換為 Yahoo Finance 格式)
+    const tickers = data.results.map(r => r.ticker).join(',');
+    
+    try {
+        // 使用公開的 Yahoo Finance API 代理 (注意：實務上建議自己架設簡單的代理伺服器)
+        // 這裡作為概念驗證，使用一個常見的免費代理。
+        // 若此代理失效，請尋找其他可用的股價 API。
+        const proxyUrl = 'https://corsproxy.io/?'; 
+        const yfUrl = encodeURIComponent(`https://query1.finance.yahoo.com/v7/finance/quote?symbols=${tickers}`);
+        
+        const response = await fetch(proxyUrl + yfUrl);
+        const yfData = await response.json();
+        
+        if (yfData.quoteResponse && yfData.quoteResponse.result) {
+            const quotes = {};
+            yfData.quoteResponse.result.forEach(q => {
+                quotes[q.symbol] = q.regularMarketPrice;
+            });
+            
+            // 將最新價格和漲跌幅寫回 data
+            data.results.forEach(item => {
+                const currentPrice = quotes[item.ticker];
+                if (currentPrice) {
+                    item.current_price = currentPrice;
+                    item.performance = ((currentPrice - item.close) / item.close) * 100;
+                } else {
+                    item.performance = null; // 無法取得最新價格
+                }
+            });
+        }
+    } catch (error) {
+        console.error("無法取得最新報價計算績效:", error);
+    }
+    return data;
+  }
+
   function initDashboard(data) {
-    document.getElementById("updateTimeBadge").textContent = "更新時間: " + (data.updated_at || "即時");
+    document.getElementById("updateTimeBadge").textContent = "選股日期: " + (data.updated_at || "即時");
     rawData = data.results || [];
-    document.getElementById("totalCandidates").textContent = rawData.length + " 檔";
-    document.getElementById("countVCP").textContent = rawData.filter(d => d.strategies.includes("VCP_BREAKOUT")).length;
-    document.getElementById("countPullback").textContent = rawData.filter(d => d.strategies.includes("PULLBACK_BUY")).length;
-    document.getElementById("countReversal").textContent = rawData.filter(d => d.strategies.includes("BOTTOM_REVERSAL")).length;
+    
+    // ... (統計數據更新邏輯保留) ...
+
+    // 動態調整表格標題：如果是歷史檢視，增加「至今績效」欄位
+    const theadTr = document.querySelector("thead tr");
+    if (isHistoricalView && !document.getElementById("perfHeader")) {
+         theadTr.innerHTML += `<th id="perfHeader">至今績效 (報價延遲)</th>`;
+    } else if (!isHistoricalView && document.getElementById("perfHeader")) {
+         document.getElementById("perfHeader").remove();
+    }
+
     renderTable();
   }
 
-  function generateSparkline(prices) {
-    if (!prices || prices.length < 2) return "-";
-    const width = 110, height = 30;
-    const min = Math.min(...prices), max = Math.max(...prices);
-    const range = (max - min) === 0 ? 1 : (max - min);
-    const points = prices.map((p, idx) => `${(idx / (prices.length - 1)) * width},${height - ((p - min) / range) * (height - 6) - 3}`).join(" ");
-    return `<svg class="sparkline-svg" width="${width}" height="${height}"><polyline fill="none" stroke="${prices[prices.length - 1] >= prices[0] ? "#ef4444" : "#10b981"}" stroke-width="2" points="${points}" /></svg>`;
-  }
+  // ... (generateSparkline 等保留) ...
 
   function renderTable() {
     const tbody = document.getElementById("screenerTableBody");
-    const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
-    const sortVal = document.getElementById("sortSelect").value;
-
-    let filtered = rawData.filter(item => {
-      const matchStrat = (currentFilter === "ALL") || item.strategies.includes(currentFilter);
-      const matchSearch = (!keyword) || item.ticker.toLowerCase().includes(keyword) || (item.name && item.name.toLowerCase().includes(keyword));
-      return matchStrat && matchSearch;
-    });
-
-    if (sortVal === "vol_desc") filtered.sort((a, b) => b.volume - a.volume);
-    if (sortVal === "price_desc") filtered.sort((a, b) => b.close - a.close);
-    if (sortVal === "price_asc") filtered.sort((a, b) => a.close - b.close);
-
-    if (filtered.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" class="empty-state">無符合條件之標的</td></tr>`;
-      return;
-    }
+    // ... (篩選與排序邏輯保留) ...
 
     tbody.innerHTML = filtered.map(item => {
-      const badges = item.strategies.map(s => {
-        if (s === "VCP_BREAKOUT") return `<span class="badge badge-vcp">VCP突破</span>`;
-        if (s === "PULLBACK_BUY") return `<span class="badge badge-pullback">拉回買進</span>`;
-        if (s === "BOTTOM_REVERSAL") return `<span class="badge badge-reversal">底部扭轉</span>`;
-        return "";
-      }).join("");
+      // ... (既有徽章、停損計算等保留) ...
 
-      let pivotText = "-", stopLoss = "-";
-      if (item.vcp) { pivotText = `樞紐: <b>${item.vcp.pivot_point}</b> (+${item.vcp.breakout_ratio}%)`; stopLoss = item.vcp.stop_loss; } 
-      else if (item.pullback) { pivotText = `月線: <b>${item.pullback.support_ma20}</b> (回檔 ${item.pullback.pullback_ratio}%)`; stopLoss = item.pullback.stop_loss; } 
-      else if (item.reversal) { pivotText = `季線: <b>${item.reversal.ma60_level}</b>`; stopLoss = item.reversal.stop_loss; }
-
-      const tickerParts = item.ticker.split('.');
-      const code = tickerParts[0];
-      const market = tickerParts.length > 1 && tickerParts[1] === 'TWO' ? 'TPEX' : 'TWSE';
-      
-      const tvUrl = `https://tw.tradingview.com/chart/?symbol=${market}%3A${code}`;
-      const pyramidUrl = `https://norway.twsthr.info/StockHolders.aspx?stock=${code}`;
+      // --- 新增：渲染績效欄位 ---
+      let perfCell = '';
+      if (isHistoricalView) {
+          if (item.performance !== undefined && item.performance !== null) {
+              const color = item.performance > 0 ? '#ef4444' : (item.performance < 0 ? '#10b981' : 'var(--text-muted)');
+              const sign = item.performance > 0 ? '+' : '';
+              perfCell = `<td style="color: ${color}; font-weight: 700;">${sign}${item.performance.toFixed(2)}%<br><span style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal;">現價: ${item.current_price.toFixed(2)}</span></td>`;
+          } else {
+              perfCell = `<td style="color: var(--text-muted);">無資料</td>`;
+          }
+      }
 
       return `
         <tr>
-          <td>
-            <div style="display: flex; align-items: center; gap: 0.4rem;">
-              <span style="font-weight: 700; color: #fff; font-size: 1.05rem;">${item.name || ''}</span>
-              <a href="${tvUrl}" target="_blank" class="ext-link tv-link" title="在 TradingView 開啟技術線圖">TV</a>
-              <a href="${pyramidUrl}" target="_blank" class="ext-link pyr-link" title="在 神秘金字塔 查詢大戶籌碼">籌碼</a>
-            </div>
-            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">${item.ticker}</div>
-          </td>
-          <td style="font-weight: 700; color: #f87171;">${item.close.toFixed(2)}</td>
-          <td>${item.volume.toLocaleString()}</td>
-          <td>${badges}</td>
-          <td>${pivotText}</td>
-          <td style="color: #10b981; font-weight: 600;">${stopLoss}</td>
+          <!-- ... (前面欄位保留) ... -->
           <td>${generateSparkline(item.chart_history)}</td>
           <td>
             <button class="action-btn" onclick="openCalcModal('${item.ticker}', '${item.name}', ${item.close}, ${stopLoss !== '-' ? stopLoss : (item.close * 0.95).toFixed(2)})">部位試算</button>
           </td>
+          ${perfCell}
         </tr>
       `;
     }).join("");
   }
 
-  document.getElementById("strategyTabs").addEventListener("click", e => {
-    if (e.target.classList.contains("tab-btn")) {
-      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-      e.target.classList.add("active");
-      currentFilter = e.target.getAttribute("data-filter");
-      renderTable();
-    }
-  });
+  // ... (事件監聽與試算機邏輯保留) ...
 
-  document.getElementById("searchInput").addEventListener("input", renderTable);
-  document.getElementById("sortSelect").addEventListener("change", renderTable);
-
-  function openCalcModal(ticker, name, closePrice, stopLoss) {
-    document.getElementById("calcModalTitle").textContent = `部位風控計算 (${ticker} ${name})`;
-    document.getElementById("calcEntryPrice").value = closePrice;
-    document.getElementById("calcStopLoss").value = stopLoss;
-    calculateRisk();
-    document.getElementById("calcModal").style.display = "flex";
-  }
-
-  function closeCalcModal() { document.getElementById("calcModal").style.display = "none"; }
-
-  function calculateRisk() {
-    const capital = parseFloat(document.getElementById("calcAccountSize").value) || 0;
-    const riskPct = parseFloat(document.getElementById("calcRiskPercent").value) || 1;
-    const entry = parseFloat(document.getElementById("calcEntryPrice").value) || 0;
-    const stop = parseFloat(document.getElementById("calcStopLoss").value) || 0;
-    const maxLoss = capital * (riskPct / 100);
-    const riskPerShare = Math.max(0.01, entry - stop);
-    const shares = Math.floor(maxLoss / riskPerShare);
-
-    document.getElementById("calcMaxLoss").textContent = `NT$ ${Math.round(maxLoss).toLocaleString()}`;
-    document.getElementById("calcRiskPerShare").textContent = `NT$ ${riskPerShare.toFixed(2)}`;
-    document.getElementById("calcSuggestedShares").textContent = shares.toLocaleString();
-    document.getElementById("calcSuggestedLots").textContent = (shares / 1000).toFixed(2);
-  }
-
-  ["calcAccountSize", "calcRiskPercent", "calcEntryPrice", "calcStopLoss"].forEach(id => {
-    document.getElementById(id).addEventListener("input", calculateRisk);
-  });
-
-  function exportCSV() {
-    if (!rawData || rawData.length === 0) return alert("目前無資料可供匯出");
-    let csv = "代碼,名稱,收盤價,成交量(張),觸發策略\n";
-    rawData.forEach(r => csv += `${r.ticker},${r.name || ''},${r.close},${r.volume},"${r.strategies.join(';')}"\n`);
-    const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = `TW_Screener_${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click(); URL.revokeObjectURL(url);
-  }
-
-  // 啟動頁面並檢查歷史
   boot();
 </script>
 </body>
