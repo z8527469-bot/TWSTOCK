@@ -41,6 +41,14 @@
     }
     .header-title h1 { font-size: 1.6rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
     .header-title p { color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem; }
+    
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
     .status-badge {
       font-size: 0.75rem;
       background: rgba(59, 130, 246, 0.15);
@@ -186,9 +194,11 @@
   <header>
     <div class="header-title">
       <h1>📈 台股波段純多頭量化選股終端</h1>
-      <p>涵蓋 TWSE / TPEx 全市場 1,800+ 標的 | 鎖定 VCP 突破、強勢回測、底部扭轉三大策略</p>
+      <p>涵蓋 TWSE / TPEx 全市場 1,800+ 標的 | 鎖定 VCP 突破、強勢回測、底部扭轉</p>
     </div>
-    <div style="display: flex; gap: 0.75rem; align-items: center;">
+    <div class="header-actions">
+      <!-- 歷史紀錄下拉選單，預設隱藏，由 JS 判斷是否有紀錄後顯示 -->
+      <select id="dateSelect" class="select-field" style="display: none; font-weight: 600; color: #60a5fa;"></select>
       <span class="status-badge" id="updateTimeBadge">載入中...</span>
       <button class="action-btn" onclick="exportCSV()">匯出 CSV</button>
     </div>
@@ -224,7 +234,7 @@
     </div>
 
     <div class="search-sort-group">
-      <input type="text" id="searchInput" class="input-field" placeholder="搜尋代碼或股名 (如: 2330 / 汎銓)...">
+      <input type="text" id="searchInput" class="input-field" placeholder="搜尋代碼或股名...">
       <select id="sortSelect" class="select-field">
         <option value="vol_desc">成交量 (大至小)</option>
         <option value="price_desc">收盤價 (高至低)</option>
@@ -316,14 +326,42 @@
     ]
   };
 
-  async function loadData() {
+  // 1. 啟動並檢查歷史目錄
+  async function boot() {
+    const dateSelect = document.getElementById("dateSelect");
     try {
-      const response = await fetch('./data.json?t=' + Date.now());
+      // 嘗試讀取歷史目錄索引 (加上 timestamp 避免快取)
+      const res = await fetch('./history/index.json?t=' + Date.now());
+      if (res.ok) {
+        const dates = await res.json();
+        if (dates && dates.length > 0) {
+          dateSelect.style.display = "inline-block";
+          dateSelect.innerHTML = `<option value="./data.json">🌟 最新覆蓋版</option>`;
+          dates.forEach(date => {
+            dateSelect.innerHTML += `<option value="./history/${date}.json">📅 歷史: ${date}</option>`;
+          });
+          // 當選擇其他日期時，切換資料來源
+          dateSelect.addEventListener("change", (e) => loadData(e.target.value));
+        }
+      }
+    } catch (e) {
+      console.log("尚未建立歷史索引，維持單一資料模式。");
+    }
+    // 預設載入最新資料
+    loadData('./data.json');
+  }
+
+  // 2. 載入指定 JSON 並重繪
+  async function loadData(url) {
+    document.getElementById("screenerTableBody").innerHTML = `<tr><td colspan="8" class="empty-state">資料載入中，請稍候...</td></tr>`;
+    try {
+      const fetchUrl = url.includes('?') ? url : url + '?t=' + Date.now();
+      const response = await fetch(fetchUrl);
       if (!response.ok) throw new Error("HTTP error " + response.status);
       const data = await response.json();
       initDashboard(data);
     } catch (e) {
-      console.warn("未能在 ./data.json 取得資料，切換至擬真展示資料模式：", e);
+      console.warn(`未能在 ${url} 取得資料，切換至擬真展示資料模式：`, e);
       initDashboard(FALLBACK_DATA);
     }
   }
@@ -380,7 +418,6 @@
       else if (item.pullback) { pivotText = `月線: <b>${item.pullback.support_ma20}</b> (回檔 ${item.pullback.pullback_ratio}%)`; stopLoss = item.pullback.stop_loss; } 
       else if (item.reversal) { pivotText = `季線: <b>${item.reversal.ma60_level}</b>`; stopLoss = item.reversal.stop_loss; }
 
-      // 提取股票代碼與市場後綴供外部連結使用
       const tickerParts = item.ticker.split('.');
       const code = tickerParts[0];
       const market = tickerParts.length > 1 && tickerParts[1] === 'TWO' ? 'TPEX' : 'TWSE';
@@ -451,3 +488,21 @@
 
   ["calcAccountSize", "calcRiskPercent", "calcEntryPrice", "calcStopLoss"].forEach(id => {
     document.getElementById(id).addEventListener("input", calculateRisk);
+  });
+
+  function exportCSV() {
+    if (!rawData || rawData.length === 0) return alert("目前無資料可供匯出");
+    let csv = "代碼,名稱,收盤價,成交量(張),觸發策略\n";
+    rawData.forEach(r => csv += `${r.ticker},${r.name || ''},${r.close},${r.volume},"${r.strategies.join(';')}"\n`);
+    const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `TW_Screener_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click(); URL.revokeObjectURL(url);
+  }
+
+  // 啟動頁面並檢查歷史
+  boot();
+</script>
+</body>
+</html>
