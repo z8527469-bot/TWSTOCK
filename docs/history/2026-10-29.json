@@ -1,0 +1,468 @@
+{
+  "updated_at": "2026-10-29 19:21:46 (CST)",
+  "total_scanned": 14,
+  "results": [
+    {
+      "ticker": "2352.TW",
+      "name": "佳世達",
+      "close": 32.8,
+      "volume": 87216,
+      "strategies": [
+        "BOTTOM_REVERSAL"
+      ],
+      "vcp": null,
+      "pullback": null,
+      "reversal": {
+        "ma60_level": 28.98,
+        "recent_trough": 28.4,
+        "stop_loss": 27.83
+      },
+      "chart_history": [
+        28.9,
+        28.55,
+        29.0,
+        28.95,
+        29.55,
+        29.0,
+        29.3,
+        28.75,
+        29.15,
+        29.45,
+        29.4,
+        29.4,
+        29.6,
+        29.85,
+        32.8
+      ]
+    },
+    {
+      "ticker": "2492.TW",
+      "name": "華新科",
+      "close": 423.0,
+      "volume": 55693,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 385.02,
+        "pullback_ratio": 1.97,
+        "stop_loss": 359.52
+      },
+      "reversal": null,
+      "chart_history": [
+        428.0,
+        420.0,
+        418.0,
+        392.0,
+        426.0,
+        405.5,
+        395.0,
+        364.0,
+        369.0,
+        405.5,
+        368.0,
+        368.0,
+        372.5,
+        398.0,
+        423.0
+      ]
+    },
+    {
+      "ticker": "2889.TW",
+      "name": "國票金",
+      "close": 17.2,
+      "volume": 8932,
+      "strategies": [
+        "BOTTOM_REVERSAL"
+      ],
+      "vcp": null,
+      "pullback": null,
+      "reversal": {
+        "ma60_level": 16.08,
+        "recent_trough": 16.2,
+        "stop_loss": 15.88
+      },
+      "chart_history": [
+        16.3,
+        16.5,
+        16.55,
+        16.8,
+        16.8,
+        16.8,
+        16.95,
+        16.8,
+        16.95,
+        16.9,
+        16.95,
+        16.95,
+        17.05,
+        17.1,
+        17.2
+      ]
+    },
+    {
+      "ticker": "4155.TW",
+      "name": "訊映",
+      "close": 17.05,
+      "volume": 1089,
+      "strategies": [
+        "BOTTOM_REVERSAL"
+      ],
+      "vcp": null,
+      "pullback": null,
+      "reversal": {
+        "ma60_level": 15.25,
+        "recent_trough": 14.87,
+        "stop_loss": 14.57
+      },
+      "chart_history": [
+        15.55,
+        15.55,
+        15.55,
+        15.55,
+        15.55,
+        15.55,
+        15.55,
+        15.8,
+        16.15,
+        17.2,
+        16.8,
+        16.8,
+        16.5,
+        16.4,
+        17.05
+      ]
+    },
+    {
+      "ticker": "6152.TW",
+      "name": "百一",
+      "close": 18.9,
+      "volume": 4949,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 18.12,
+        "pullback_ratio": 11.06,
+        "stop_loss": 16.7
+      },
+      "reversal": null,
+      "chart_history": [
+        19.8,
+        21.0,
+        20.2,
+        18.95,
+        18.6,
+        17.7,
+        17.8,
+        17.45,
+        19.0,
+        18.35,
+        18.2,
+        18.2,
+        17.1,
+        18.5,
+        18.9
+      ]
+    },
+    {
+      "ticker": "6155.TW",
+      "name": "鈞寶",
+      "close": 70.5,
+      "volume": 5460,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 69.22,
+        "pullback_ratio": 6.62,
+        "stop_loss": 64.81
+      },
+      "reversal": null,
+      "chart_history": [
+        71.5,
+        70.9,
+        70.2,
+        69.2,
+        72.4,
+        71.0,
+        69.0,
+        66.0,
+        65.2,
+        71.7,
+        69.5,
+        69.5,
+        65.9,
+        68.0,
+        70.5
+      ]
+    },
+    {
+      "ticker": "6715.TW",
+      "name": "嘉基",
+      "close": 482.5,
+      "volume": 1512,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 482.0,
+        "pullback_ratio": 14.6,
+        "stop_loss": 430.44
+      },
+      "reversal": null,
+      "chart_history": [
+        485.0,
+        464.0,
+        501.0,
+        507.0,
+        557.0,
+        533.0,
+        500.0,
+        480.5,
+        464.5,
+        480.0,
+        480.5,
+        480.5,
+        437.0,
+        480.5,
+        482.5
+      ]
+    },
+    {
+      "ticker": "2061.TWO",
+      "name": "風青",
+      "close": 64.6,
+      "volume": 3075,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 63.0,
+        "pullback_ratio": 10.03,
+        "stop_loss": 54.96
+      },
+      "reversal": null,
+      "chart_history": [
+        68.4,
+        67.3,
+        67.5,
+        63.8,
+        67.0,
+        61.3,
+        61.3,
+        58.3,
+        59.8,
+        61.4,
+        58.1,
+        58.1,
+        58.7,
+        64.5,
+        64.6
+      ]
+    },
+    {
+      "ticker": "3114.TWO",
+      "name": "好德",
+      "close": 41.4,
+      "volume": 2224,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 39.74,
+        "pullback_ratio": 13.66,
+        "stop_loss": 37.68
+      },
+      "reversal": null,
+      "chart_history": [
+        39.55,
+        38.35,
+        39.05,
+        37.55,
+        41.3,
+        40.85,
+        41.5,
+        38.1,
+        41.9,
+        41.95,
+        39.55,
+        39.55,
+        38.55,
+        41.0,
+        41.4
+      ]
+    },
+    {
+      "ticker": "3293.TWO",
+      "name": "鈊象",
+      "close": 808.0,
+      "volume": 1570,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 793.15,
+        "pullback_ratio": 1.34,
+        "stop_loss": 765.35
+      },
+      "reversal": null,
+      "chart_history": [
+        780.0,
+        788.0,
+        797.0,
+        797.0,
+        811.0,
+        811.0,
+        795.0,
+        774.0,
+        783.0,
+        782.0,
+        787.0,
+        787.0,
+        796.0,
+        800.0,
+        808.0
+      ]
+    },
+    {
+      "ticker": "3537.TWO",
+      "name": "堡達",
+      "close": 56.5,
+      "volume": 261,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 56.16,
+        "pullback_ratio": 7.53,
+        "stop_loss": 53.19
+      },
+      "reversal": null,
+      "chart_history": [
+        56.3,
+        56.9,
+        56.5,
+        55.8,
+        59.0,
+        56.4,
+        57.0,
+        56.5,
+        55.6,
+        56.6,
+        54.6,
+        54.6,
+        54.8,
+        56.2,
+        56.5
+      ]
+    },
+    {
+      "ticker": "6620.TWO",
+      "name": "漢達",
+      "close": 137.5,
+      "volume": 1435,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 135.53,
+        "pullback_ratio": 11.29,
+        "stop_loss": 131.5
+      },
+      "reversal": null,
+      "chart_history": [
+        125.0,
+        127.5,
+        127.5,
+        124.5,
+        136.5,
+        130.5,
+        143.5,
+        138.0,
+        129.5,
+        133.5,
+        139.0,
+        139.0,
+        134.5,
+        136.5,
+        137.5
+      ]
+    },
+    {
+      "ticker": "6708.TWO",
+      "name": "天擎",
+      "close": 64.6,
+      "volume": 1577,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 62.95,
+        "pullback_ratio": 14.32,
+        "stop_loss": 56.24
+      },
+      "reversal": null,
+      "chart_history": [
+        68.5,
+        69.2,
+        70.5,
+        64.7,
+        64.6,
+        58.2,
+        55.0,
+        60.5,
+        66.5,
+        64.0,
+        60.1,
+        60.1,
+        57.2,
+        62.9,
+        64.6
+      ]
+    },
+    {
+      "ticker": "8042.TWO",
+      "name": "金山電",
+      "close": 141.0,
+      "volume": 8700,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 134.28,
+        "pullback_ratio": 15.06,
+        "stop_loss": 127.56
+      },
+      "reversal": null,
+      "chart_history": [
+        126.0,
+        138.5,
+        144.0,
+        144.0,
+        158.0,
+        148.0,
+        144.0,
+        131.0,
+        135.0,
+        148.5,
+        135.5,
+        135.5,
+        133.0,
+        137.5,
+        141.0
+      ]
+    }
+  ]
+}
