@@ -406,3 +406,7 @@ def save_output(results: List[dict]):
   print(f"\n🎉 全市場掃描完成！符合條件標的共 {len(results)} 檔。")
   print(f"📁 最新結果已儲存至: {OUTPUT_FILE}")
   print(f"🗄️ 歷史紀錄已歸檔至: {history_file}")
+
+if __name__ == "__main__":
+  results = run_full_market_screener()
+  save_output(results)
