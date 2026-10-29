@@ -6,6 +6,10 @@ on:
     - cron: '30 7 * * 1-5'
   workflow_dispatch: # 支援手動一鍵點擊執行
 
+# 授權 GitHub Actions 寫入權限，才能成功 Push 回倉庫
+permissions:
+  contents: write
+
 jobs:
   screen:
     runs-on: ubuntu-latest
@@ -30,5 +34,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/data.json
+          # 使用 git add . 將 data.json 與 history 資料夾一併加入
+          git add .
+          git status
           git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update daily screener results [skip ci]" && git push)
