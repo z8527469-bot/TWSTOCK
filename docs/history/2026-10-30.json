@@ -1,0 +1,342 @@
+{
+  "updated_at": "2026-10-30 20:55:35 (CST)",
+  "total_scanned": 10,
+  "results": [
+    {
+      "ticker": "2352.TW",
+      "name": "佳世達",
+      "close": 33.8,
+      "volume": 79047,
+      "strategies": [
+        "BOTTOM_REVERSAL"
+      ],
+      "vcp": null,
+      "pullback": null,
+      "reversal": {
+        "ma60_level": 29.07,
+        "recent_trough": 28.4,
+        "stop_loss": 27.83
+      },
+      "chart_history": [
+        28.55,
+        29.0,
+        28.95,
+        29.55,
+        29.0,
+        29.3,
+        28.75,
+        29.15,
+        29.45,
+        29.4,
+        29.4,
+        29.6,
+        29.85,
+        32.8,
+        33.8
+      ]
+    },
+    {
+      "ticker": "2603.TW",
+      "name": "長榮",
+      "close": 271.5,
+      "volume": 23291,
+      "strategies": [
+        "VCP_BREAKOUT",
+        "PULLBACK_BUY"
+      ],
+      "vcp": {
+        "pivot_point": 270.5,
+        "breakout_ratio": 0.37,
+        "volume_surge_ratio": 1.71,
+        "stop_loss": 259.68
+      },
+      "pullback": {
+        "support_ma20": 253.75,
+        "pullback_ratio": -0.37,
+        "stop_loss": 250.19
+      },
+      "reversal": null,
+      "chart_history": [
+        232.5,
+        255.5,
+        264.0,
+        263.0,
+        257.0,
+        265.5,
+        262.0,
+        259.5,
+        257.5,
+        260.0,
+        260.0,
+        261.5,
+        263.0,
+        261.0,
+        271.5
+      ]
+    },
+    {
+      "ticker": "2609.TW",
+      "name": "陽明",
+      "close": 63.5,
+      "volume": 30278,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 61.96,
+        "pullback_ratio": 4.51,
+        "stop_loss": 60.38
+      },
+      "reversal": null,
+      "chart_history": [
+        59.7,
+        63.6,
+        64.5,
+        65.0,
+        63.3,
+        64.7,
+        63.5,
+        62.2,
+        62.1,
+        61.9,
+        61.9,
+        63.0,
+        62.9,
+        62.0,
+        63.5
+      ]
+    },
+    {
+      "ticker": "2834.TW",
+      "name": "臺企銀",
+      "close": 18.05,
+      "volume": 28053,
+      "strategies": [
+        "BOTTOM_REVERSAL"
+      ],
+      "vcp": null,
+      "pullback": null,
+      "reversal": {
+        "ma60_level": 17.36,
+        "recent_trough": 17.4,
+        "stop_loss": 17.05
+      },
+      "chart_history": [
+        17.45,
+        17.75,
+        17.75,
+        17.7,
+        17.65,
+        18.05,
+        17.9,
+        17.8,
+        17.9,
+        17.9,
+        17.9,
+        17.9,
+        18.0,
+        18.0,
+        18.05
+      ]
+    },
+    {
+      "ticker": "6152.TW",
+      "name": "百一",
+      "close": 19.0,
+      "volume": 3917,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 18.31,
+        "pullback_ratio": 10.59,
+        "stop_loss": 16.7
+      },
+      "reversal": null,
+      "chart_history": [
+        21.0,
+        20.2,
+        18.95,
+        18.6,
+        17.7,
+        17.8,
+        17.45,
+        19.0,
+        18.35,
+        18.2,
+        18.2,
+        17.1,
+        18.5,
+        18.9,
+        19.0
+      ]
+    },
+    {
+      "ticker": "3293.TWO",
+      "name": "鈊象",
+      "close": 810.0,
+      "volume": 1999,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 794.25,
+        "pullback_ratio": 1.1,
+        "stop_loss": 774.21
+      },
+      "reversal": null,
+      "chart_history": [
+        788.0,
+        797.0,
+        797.0,
+        811.0,
+        811.0,
+        795.0,
+        774.0,
+        783.0,
+        782.0,
+        787.0,
+        787.0,
+        796.0,
+        800.0,
+        808.0,
+        810.0
+      ]
+    },
+    {
+      "ticker": "3631.TWO",
+      "name": "晟楠",
+      "close": 44.95,
+      "volume": 283,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 44.41,
+        "pullback_ratio": 8.27,
+        "stop_loss": 41.47
+      },
+      "reversal": null,
+      "chart_history": [
+        47.05,
+        47.25,
+        45.6,
+        49.0,
+        46.9,
+        44.05,
+        45.15,
+        45.0,
+        45.1,
+        43.9,
+        43.9,
+        43.5,
+        44.7,
+        44.45,
+        44.95
+      ]
+    },
+    {
+      "ticker": "3691.TWO",
+      "name": "碩禾",
+      "close": 141.0,
+      "volume": 11516,
+      "strategies": [
+        "BOTTOM_REVERSAL"
+      ],
+      "vcp": null,
+      "pullback": null,
+      "reversal": {
+        "ma60_level": 106.27,
+        "recent_trough": 92.31,
+        "stop_loss": 90.46
+      },
+      "chart_history": [
+        103.5,
+        104.0,
+        99.6,
+        101.5,
+        97.5,
+        98.3,
+        94.46,
+        92.31,
+        97.21,
+        106.81,
+        106.81,
+        119.5,
+        131.0,
+        144.0,
+        141.0
+      ]
+    },
+    {
+      "ticker": "6234.TWO",
+      "name": "高僑",
+      "close": 48.4,
+      "volume": 5163,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 44.91,
+        "pullback_ratio": 8.16,
+        "stop_loss": 41.96
+      },
+      "reversal": null,
+      "chart_history": [
+        39.5,
+        43.45,
+        45.0,
+        45.95,
+        44.6,
+        48.1,
+        48.8,
+        47.95,
+        50.4,
+        49.05,
+        49.05,
+        46.1,
+        48.05,
+        45.65,
+        48.4
+      ]
+    },
+    {
+      "ticker": "6532.TWO",
+      "name": "瑞耘",
+      "close": 119.5,
+      "volume": 2278,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 117.05,
+        "pullback_ratio": 9.47,
+        "stop_loss": 104.41
+      },
+      "reversal": null,
+      "chart_history": [
+        108.5,
+        106.0,
+        114.5,
+        125.5,
+        119.5,
+        123.0,
+        124.0,
+        118.5,
+        121.5,
+        114.5,
+        114.5,
+        116.0,
+        119.5,
+        114.0,
+        119.5
+      ]
+    }
+  ]
+}
