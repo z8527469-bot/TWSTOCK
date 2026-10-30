@@ -34,7 +34,15 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          # 使用 git add . 將 data.json 與 history 資料夾一併加入
           git add .
-          git status
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: update daily screener results [skip ci]" && git push)
+          
+          # 檢查是否有檔案變動，如果有才執行 commit 與 push
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: update daily screener results [skip ci]"
+            # 先拉取遠端最新變更並合併，避免版本衝突
+            git pull --rebase origin main
+            # 推播回 GitHub
+            git push
+          else
+            echo "No changes to commit."
+          fi
