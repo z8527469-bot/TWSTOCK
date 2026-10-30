@@ -3,7 +3,7 @@ name: Daily Taiwan Stock Screener
 on:
   schedule:
     # 台灣時間週一至週五 15:30 (UTC 07:30)
-    - cron: '30 7 * * 1-5'
+    - cron: '33 8 * * 1-5'
   workflow_dispatch: # 支援手動一鍵點擊執行
 
 # 授權 GitHub Actions 寫入權限，才能成功 Push 回倉庫
