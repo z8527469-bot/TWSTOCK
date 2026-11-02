@@ -226,34 +226,37 @@
     }
   }
 
-  async function appendCurrentPerformance(data) {
+async function appendCurrentPerformance(data) {
     if (!data.results || data.results.length === 0) return data;
     const tickers = data.results.map(r => r.ticker).join(',');
-    
+
     try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 8000); 
-        
-        const proxyUrl = 'https://corsproxy.io/?'; 
-        const yfUrl = encodeURIComponent(`https://query1.finance.yahoo.com/v7/finance/quote?symbols=${tickers}`);
+        // 更換為更穩定的 allorigins 免費代理服務
+        const proxyUrl = 'https://api.allorigins.win/raw?url='; 
+        // 改用 query2 端點，通常比 query1 穩定且阻擋較少
+        const yfUrl = encodeURIComponent(`https://query2.finance.yahoo.com/v7/finance/quote?symbols=${tickers}`);
         
         const response = await fetch(proxyUrl + yfUrl, { signal: controller.signal });
         clearTimeout(timeoutId);
-        
+
+        if (!response.ok) throw new Error("代理伺服器或 API 回應錯誤");
+
         const yfData = await response.json();
-        
+
         if (yfData.quoteResponse && yfData.quoteResponse.result) {
             const quotes = {};
             yfData.quoteResponse.result.forEach(q => quotes[q.symbol] = q.regularMarketPrice);
-            
+
             data.results.forEach(item => {
                 const currentPrice = quotes[item.ticker];
                 if (currentPrice) {
-                    item.current_price = currentPrice;
+                  item.current_price = currentPrice;
                     item.performance = ((currentPrice - item.close) / item.close) * 100;
                 }
             });
-        }
+          }
     } catch (error) {
         console.error("無法取得最新報價，將忽略績效欄位:", error);
     }
