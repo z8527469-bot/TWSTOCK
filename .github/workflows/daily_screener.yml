@@ -3,7 +3,7 @@ name: Daily Taiwan Stock Screener
 on:
   schedule:
     # 台灣時間週一至週五 15:30 (UTC 07:30)
-    - cron: '33 8 * * 1-5'
+    - cron: '30 7 * * 1-5'
   workflow_dispatch: # 支援手動一鍵點擊執行
 
 # 授權 GitHub Actions 寫入權限，才能成功 Push 回倉庫
@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -34,6 +36,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          # 使用 git add . 將 data.json, history 資料夾與 latest_prices.json 一併加入
           git add .
           
           # 檢查是否有檔案變動，如果有才執行 commit 與 push
