@@ -216,7 +216,7 @@
       let data = await response.json();
       
       if (isHistoricalView) {
-          document.getElementById("screenerTableBody").innerHTML = `<tr><td colspan="9" class="empty-state">正在計算歷史績效，請稍候... (若卡住代表網路代理無回應)</td></tr>`;
+          document.getElementById("screenerTableBody").innerHTML = `<tr><td colspan="9" class="empty-state">正在計算歷史績效，請稍候...</td></tr>`;
           data = await appendCurrentPerformance(data);
       }
       initDashboard(data);
@@ -226,39 +226,24 @@
     }
   }
 
-async function appendCurrentPerformance(data) {
+  // --- 改為從 GitHub 讀取 latest_prices.json 進行績效計算 ---
+  async function appendCurrentPerformance(data) {
     if (!data.results || data.results.length === 0) return data;
-    const tickers = data.results.map(r => r.ticker).join(',');
-
+    
     try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000); 
-        // 更換為更穩定的 allorigins 免費代理服務
-        const proxyUrl = 'https://api.allorigins.win/raw?url='; 
-        // 改用 query2 端點，通常比 query1 穩定且阻擋較少
-        const yfUrl = encodeURIComponent(`https://query2.finance.yahoo.com/v7/finance/quote?symbols=${tickers}`);
+        const res = await fetch('./latest_prices.json?t=' + Date.now());
+        if (!res.ok) throw new Error("尚未產生 latest_prices.json，請先執行一次全市場掃描");
+        const latestPrices = await res.json();
         
-        const response = await fetch(proxyUrl + yfUrl, { signal: controller.signal });
-        clearTimeout(timeoutId);
-
-        if (!response.ok) throw new Error("代理伺服器或 API 回應錯誤");
-
-        const yfData = await response.json();
-
-        if (yfData.quoteResponse && yfData.quoteResponse.result) {
-            const quotes = {};
-            yfData.quoteResponse.result.forEach(q => quotes[q.symbol] = q.regularMarketPrice);
-
-            data.results.forEach(item => {
-                const currentPrice = quotes[item.ticker];
-                if (currentPrice) {
-                  item.current_price = currentPrice;
-                    item.performance = ((currentPrice - item.close) / item.close) * 100;
-                }
-            });
-          }
+        data.results.forEach(item => {
+            const currentPrice = latestPrices[item.ticker];
+            if (currentPrice) {
+                item.current_price = currentPrice;
+                item.performance = ((currentPrice - item.close) / item.close) * 100;
+            }
+        });
     } catch (error) {
-        console.error("無法取得最新報價，將忽略績效欄位:", error);
+        console.error("無法取得最新價格進行計算:", error);
     }
     return data;
   }
@@ -276,7 +261,7 @@ async function appendCurrentPerformance(data) {
     const existingPerfHeader = document.getElementById("perfHeader");
     
     if (isHistoricalView && !existingPerfHeader) {
-         theadTr.innerHTML += `<th id="perfHeader">至今績效 (報價延遲)</th>`;
+         theadTr.innerHTML += `<th id="perfHeader">至今績效 (更新至最新掃描日)</th>`;
     } else if (!isHistoricalView && existingPerfHeader) {
          existingPerfHeader.remove();
     }
