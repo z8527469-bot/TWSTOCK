@@ -3,7 +3,7 @@
 - 標的來源: 自動動態抓取 TWSE (上市) 與 TPEx (上櫃) 全部 4 碼普通股
 - 併發架構: 分塊批量下載 (Batch Chunking)，兼顧下載速度與防 429 速率限制
 - 整合策略: VCP 壓縮突破、強勢股回後買、底部扭轉底底高
-- 輸出: 自動生成 docs/data.json 與 history 存檔，供 GitHub Pages 儀表板呈現
+- 輸出: 自動生成 docs/data.json、history 存檔與 latest_prices.json
 """
 
 import io
@@ -12,7 +12,7 @@ import os
 import re
 import time
 from datetime import datetime, timezone, timedelta
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 import requests
@@ -50,7 +50,6 @@ def fetch_tw_stock_universe() -> Dict[str, str]:
     try:
       resp = requests.get(url, headers=headers, timeout=15)
       resp.encoding = "big5-hkscs"
-      # 使用 io.StringIO 避免 Pandas 路徑過長報錯
       dfs = pd.read_html(io.StringIO(resp.text))
       if not dfs:
         continue
@@ -174,7 +173,7 @@ def compute_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # ==================== 4. 分塊批次全市場掃描引擎 ====================
-def run_full_market_screener() -> List[dict]:
+def run_full_market_screener() -> Tuple[List[dict], Dict[str, float]]:
   universe = fetch_tw_stock_universe()
   ticker_list = list(universe.keys())
 
@@ -184,6 +183,7 @@ def run_full_market_screener() -> List[dict]:
 
   total_stocks = len(ticker_list)
   matched_results = []
+  latest_prices_dict = {}  # 收集全市場最新價格
   scanned_count = 0
 
   print(f"🚀 開始全市場掃描：共 {total_stocks} 檔標的，以 {CHUNK_SIZE} 檔為一組批次處理...")
@@ -215,6 +215,8 @@ def run_full_market_screener() -> List[dict]:
         df["volume"] = df["volume"] / 1000.0
 
         latest_close = float(df["close"].iloc[-1])
+        latest_prices_dict[ticker] = round(latest_close, 2) # 記錄最新價
+
         vol_ma20 = float(df["volume"].rolling(20).mean().iloc[-1])
         if latest_close < MIN_PRICE or vol_ma20 < MIN_VOLUME_MA20:
           continue
@@ -248,11 +250,11 @@ def run_full_market_screener() -> List[dict]:
     print(f"⏳ 進度：[{min(scanned_count, total_stocks)}/{total_stocks}] ({scanned_count/total_stocks*100:.1f}%) | 目前入選: {len(matched_results)} 檔")
     time.sleep(REQUEST_SLEEP)
 
-  return matched_results
+  return matched_results, latest_prices_dict
 
 
 # ==================== 5. 輸出 JSON 與自動維護歷史存檔 ====================
-def save_output(results: List[dict]):
+def save_output(results: List[dict], latest_prices: Dict[str, float]):
   tz_tw = timezone(timedelta(hours=8))
   now = datetime.now(tz_tw)
   date_str = now.strftime("%Y-%m-%d")
@@ -261,6 +263,11 @@ def save_output(results: List[dict]):
   os.makedirs(OUTPUT_DIR, exist_ok=True)
   history_dir = os.path.join(OUTPUT_DIR, "history")
   os.makedirs(history_dir, exist_ok=True)
+
+  # 寫入全市場最新價格
+  prices_file = os.path.join(OUTPUT_DIR, "latest_prices.json")
+  with open(prices_file, "w", encoding="utf-8") as f:
+    json.dump(latest_prices, f, ensure_ascii=False, indent=2)
 
   payload = {
       "updated_at": updated_str,
@@ -298,8 +305,9 @@ def save_output(results: List[dict]):
   print(f"\n🎉 全市場掃描完成！符合條件標的共 {len(results)} 檔。")
   print(f"📁 最新結果已儲存至: {OUTPUT_FILE}")
   print(f"🗄️ 歷史紀錄已歸檔至: {history_file}")
+  print(f"📈 最新價格庫已更新至: {prices_file}")
 
 
 if __name__ == "__main__":
-  results = run_full_market_screener()
-  save_output(results)
+  results, latest_prices = run_full_market_screener()
+  save_output(results, latest_prices)
