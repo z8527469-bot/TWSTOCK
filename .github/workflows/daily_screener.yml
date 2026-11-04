@@ -4,9 +4,15 @@ on:
   schedule:
     # 台灣時間週一至週五 15:30 (UTC 07:30)
     - cron: '30 7 * * 1-5'
-  workflow_dispatch: # 支援手動一鍵點擊執行
+  workflow_dispatch:
+    # 新增手動觸發時的「強制執行」選項
+    inputs:
+      force_run:
+        description: '強制重新執行 (無視今天是否已經產生過檔案)'
+        type: boolean
+        required: false
+        default: false
 
-# 授權 GitHub Actions 寫入權限，才能成功 Push 回倉庫
 permissions:
   contents: write
 
@@ -30,22 +36,23 @@ jobs:
 
       - name: Run Full-Market Screener
         run: |
-          python screener.py
+          # 判斷是否勾選了強制執行，若有則加上 --force 參數傳給 Python
+          if [ "${{ github.event.inputs.force_run }}" == "true" ]; then
+            python screener.py --force
+          else
+            python screener.py
+          fi
 
       - name: Commit and Push Results
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          # 使用 git add . 將 data.json, history 資料夾與 latest_prices.json 一併加入
           git add .
           
-          # 檢查是否有檔案變動，如果有才執行 commit 與 push
           if ! git diff --staged --quiet; then
             git commit -m "chore: update daily screener results [skip ci]"
-            # 先拉取遠端最新變更並合併，避免版本衝突
             git pull --rebase origin main
-            # 推播回 GitHub
             git push
           else
-            echo "No changes to commit."
+            echo "No changes to commit (可能是跳過執行或資料無異動)."
           fi
