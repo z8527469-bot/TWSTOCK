@@ -309,5 +309,22 @@ def save_output(results: List[dict], latest_prices: Dict[str, float]):
 
 
 if __name__ == "__main__":
+  import sys
+  
+  # 取得台灣時間今天的日期字串
+  tz_tw = timezone(timedelta(hours=8))
+  date_str = datetime.now(tz_tw).strftime("%Y-%m-%d")
+  history_file = os.path.join(OUTPUT_DIR, "history", f"{date_str}.json")
+
+  # 檢查執行時是否帶有 --force 參數
+  force_run = "--force" in sys.argv
+
+  # 核心防護機制：如果今天的檔案已存在，且沒有強制重跑，就直接退出
+  if os.path.exists(history_file) and not force_run:
+    print(f"⏩ 發現今天 ({date_str}) 的紀錄檔 {history_file} 已經存在！")
+    print("為避免重複執行浪費資源，本次全市場掃描自動跳過。")
+    sys.exit(0)
+
+  # 開始執行掃描與存檔
   results, latest_prices = run_full_market_screener()
   save_output(results, latest_prices)
