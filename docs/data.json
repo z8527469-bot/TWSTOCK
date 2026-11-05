@@ -1,137 +1,248 @@
 {
-  "updated_at": "2026-11-04 15:10:21 (CST)",
-  "total_scanned": 4,
+  "updated_at": "2026-11-05 23:16:36 (CST)",
+  "total_scanned": 7,
   "results": [
     {
-      "ticker": "2023.TW",
-      "name": "燁輝",
-      "close": 15.05,
-      "volume": 2072,
+      "ticker": "1476.TW",
+      "name": "儒鴻",
+      "close": 339.5,
+      "volume": 5985,
       "strategies": [
+        "VCP_BREAKOUT",
+        "PULLBACK_BUY",
         "BOTTOM_REVERSAL"
       ],
-      "vcp": null,
-      "pullback": null,
-      "reversal": {
-        "ma60_level": 14.08,
-        "recent_trough": 14.15,
-        "stop_loss": 13.87
+      "vcp": {
+        "pivot_point": 329.0,
+        "breakout_ratio": 3.19,
+        "volume_surge_ratio": 3.54,
+        "stop_loss": 315.84
       },
-      "chart_history": [
-        14.45,
-        14.6,
-        15.05,
-        15.1,
-        15.05,
-        14.7,
-        15.05,
-        15.05,
-        15.2,
-        14.65,
-        14.35,
-        14.35,
-        14.8,
-        14.85,
-        15.05
-      ]
-    },
-    {
-      "ticker": "2465.TW",
-      "name": "麗臺",
-      "close": 125.0,
-      "volume": 10796,
-      "strategies": [
-        "BOTTOM_REVERSAL"
-      ],
-      "vcp": null,
-      "pullback": null,
-      "reversal": {
-        "ma60_level": 93.36,
-        "recent_trough": 82.6,
-        "stop_loss": 80.95
-      },
-      "chart_history": [
-        85.5,
-        83.7,
-        86.0,
-        82.7,
-        82.8,
-        87.5,
-        96.2,
-        96.2,
-        93.9,
-        103.0,
-        113.0,
-        102.0,
-        112.0,
-        114.0,
-        125.0
-      ]
-    },
-    {
-      "ticker": "3031.TW",
-      "name": "佰鴻",
-      "close": 33.25,
-      "volume": 4036,
-      "strategies": [
-        "PULLBACK_BUY"
-      ],
-      "vcp": null,
       "pullback": {
-        "support_ma20": 32.6,
-        "pullback_ratio": 5.0,
-        "stop_loss": 29.55
+        "support_ma20": 319.27,
+        "pullback_ratio": -2.57,
+        "stop_loss": 306.33
       },
+      "reversal": {
+        "ma60_level": 307.03,
+        "recent_trough": 311.0,
+        "stop_loss": 304.78
+      },
+      "chart_history": [
+        324.0,
+        329.5,
+        321.0,
+        325.5,
+        325.0,
+        324.5,
+        324.5,
+        323.0,
+        317.5,
+        322.0,
+        320.5,
+        318.5,
+        313.5,
+        312.5,
+        339.5
+      ]
+    },
+    {
+      "ticker": "1477.TW",
+      "name": "聚陽",
+      "close": 214.5,
+      "volume": 4576,
+      "strategies": [
+        "BOTTOM_REVERSAL"
+      ],
+      "vcp": null,
+      "pullback": null,
+      "reversal": {
+        "ma60_level": 200.99,
+        "recent_trough": 201.5,
+        "stop_loss": 197.47
+      },
+      "chart_history": [
+        208.5,
+        211.0,
+        207.5,
+        207.5,
+        209.0,
+        209.0,
+        209.0,
+        207.0,
+        208.0,
+        206.5,
+        206.5,
+        205.0,
+        204.0,
+        203.5,
+        214.5
+      ]
+    },
+    {
+      "ticker": "2206.TW",
+      "name": "三陽工業",
+      "close": 63.6,
+      "volume": 1004,
+      "strategies": [
+        "BOTTOM_REVERSAL"
+      ],
+      "vcp": null,
+      "pullback": null,
+      "reversal": {
+        "ma60_level": 63.34,
+        "recent_trough": 62.6,
+        "stop_loss": 61.35
+      },
+      "chart_history": [
+        65.3,
+        65.5,
+        64.2,
+        63.9,
+        63.9,
+        64.2,
+        64.2,
+        63.3,
+        63.2,
+        64.0,
+        63.8,
+        63.8,
+        63.2,
+        63.1,
+        63.6
+      ]
+    },
+    {
+      "ticker": "2471.TW",
+      "name": "資通",
+      "close": 54.6,
+      "volume": 11268,
+      "strategies": [
+        "BOTTOM_REVERSAL"
+      ],
+      "vcp": null,
+      "pullback": null,
+      "reversal": {
+        "ma60_level": 50.6,
+        "recent_trough": 49.55,
+        "stop_loss": 48.56
+      },
+      "chart_history": [
+        50.7,
+        50.8,
+        49.9,
+        49.75,
+        49.95,
+        50.4,
+        50.4,
+        50.5,
+        50.4,
+        50.3,
+        50.0,
+        51.1,
+        49.85,
+        52.5,
+        54.6
+      ]
+    },
+    {
+      "ticker": "2610.TW",
+      "name": "華航",
+      "close": 21.65,
+      "volume": 89913,
+      "strategies": [
+        "BOTTOM_REVERSAL"
+      ],
+      "vcp": null,
+      "pullback": null,
+      "reversal": {
+        "ma60_level": 20.38,
+        "recent_trough": 20.05,
+        "stop_loss": 19.65
+      },
+      "chart_history": [
+        20.55,
+        21.05,
+        20.55,
+        20.4,
+        20.35,
+        20.5,
+        20.5,
+        20.45,
+        20.25,
+        20.25,
+        20.15,
+        20.65,
+        20.7,
+        20.5,
+        21.65
+      ]
+    },
+    {
+      "ticker": "2618.TW",
+      "name": "長榮航",
+      "close": 45.1,
+      "volume": 62500,
+      "strategies": [
+        "BOTTOM_REVERSAL"
+      ],
+      "vcp": null,
+      "pullback": null,
+      "reversal": {
+        "ma60_level": 42.33,
+        "recent_trough": 41.8,
+        "stop_loss": 40.96
+      },
+      "chart_history": [
+        43.45,
+        43.7,
+        42.7,
+        42.35,
+        42.05,
+        42.2,
+        42.2,
+        42.95,
+        42.4,
+        42.75,
+        42.7,
+        43.15,
+        43.7,
+        43.75,
+        45.1
+      ]
+    },
+    {
+      "ticker": "4755.TW",
+      "name": "三福化",
+      "close": 130.0,
+      "volume": 3521,
+      "strategies": [
+        "VCP_BREAKOUT"
+      ],
+      "vcp": {
+        "pivot_point": 127.5,
+        "breakout_ratio": 1.96,
+        "volume_surge_ratio": 6.12,
+        "stop_loss": 122.4
+      },
+      "pullback": null,
       "reversal": null,
       "chart_history": [
-        32.35,
-        30.7,
-        31.15,
-        30.35,
-        32.55,
-        33.4,
-        32.3,
-        32.3,
-        32.7,
-        33.9,
-        33.1,
-        31.1,
-        33.0,
-        31.9,
-        33.25
-      ]
-    },
-    {
-      "ticker": "6609.TWO",
-      "name": "瀧澤科",
-      "close": 48.2,
-      "volume": 4595,
-      "strategies": [
-        "BOTTOM_REVERSAL"
-      ],
-      "vcp": null,
-      "pullback": null,
-      "reversal": {
-        "ma60_level": 40.19,
-        "recent_trough": 39.35,
-        "stop_loss": 38.56
-      },
-      "chart_history": [
-        39.8,
-        39.85,
-        39.8,
-        43.75,
-        41.0,
-        41.6,
-        41.4,
-        41.4,
-        43.2,
-        43.3,
-        43.5,
-        41.3,
-        45.4,
-        43.85,
-        48.2
+        123.0,
+        125.0,
+        122.0,
+        122.5,
+        125.0,
+        120.0,
+        120.0,
+        120.5,
+        122.5,
+        120.0,
+        118.0,
+        119.0,
+        113.5,
+        124.5,
+        130.0
       ]
     }
   ]
