@@ -1,0 +1,72 @@
+{
+  "updated_at": "2026-11-12 16:12:09 (CST)",
+  "total_scanned": 2,
+  "results": [
+    {
+      "ticker": "4720.TW",
+      "name": "德淵",
+      "close": 29.1,
+      "volume": 17225,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 28.89,
+        "pullback_ratio": 17.68,
+        "stop_loss": 25.81
+      },
+      "reversal": null,
+      "chart_history": [
+        30.95,
+        30.95,
+        34.0,
+        32.5,
+        29.25,
+        27.0,
+        29.7,
+        31.15,
+        33.3,
+        30.0,
+        27.1,
+        27.2,
+        27.25,
+        27.6,
+        29.1
+      ]
+    },
+    {
+      "ticker": "4105.TWO",
+      "name": "東洋",
+      "close": 83.7,
+      "volume": 1908,
+      "strategies": [
+        "BOTTOM_REVERSAL"
+      ],
+      "vcp": null,
+      "pullback": null,
+      "reversal": {
+        "ma60_level": 79.22,
+        "recent_trough": 77.1,
+        "stop_loss": 75.56
+      },
+      "chart_history": [
+        80.6,
+        80.6,
+        80.6,
+        80.1,
+        80.4,
+        79.9,
+        80.0,
+        78.9,
+        79.7,
+        80.2,
+        79.2,
+        81.3,
+        82.2,
+        82.1,
+        83.7
+      ]
+    }
+  ]
+}
