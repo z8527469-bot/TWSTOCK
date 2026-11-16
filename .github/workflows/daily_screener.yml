@@ -3,7 +3,7 @@ name: Daily Taiwan Stock Screener
 on:
   schedule:
     # 台灣時間週一至週五 15:30 (UTC 07:30)
-    - cron: '30 7 * * 1-5'
+    - cron: '36 7 * * 1-5'
   workflow_dispatch:
     # 新增手動觸發時的「強制執行」選項
     inputs:
