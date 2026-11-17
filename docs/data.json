@@ -1,39 +1,5 @@
 {
-  "updated_at": "2026-11-17 20:56:11 (CST)",
-  "total_scanned": 1,
-  "results": [
-    {
-      "ticker": "2618.TW",
-      "name": "長榮航",
-      "close": 48.1,
-      "volume": 32802,
-      "strategies": [
-        "BOTTOM_REVERSAL"
-      ],
-      "vcp": null,
-      "pullback": null,
-      "reversal": {
-        "ma60_level": 42.98,
-        "recent_trough": 42.0,
-        "stop_loss": 41.16
-      },
-      "chart_history": [
-        42.4,
-        42.75,
-        42.7,
-        43.15,
-        43.7,
-        43.75,
-        45.1,
-        43.6,
-        43.9,
-        46.15,
-        47.6,
-        46.9,
-        47.75,
-        47.4,
-        48.1
-      ]
-    }
-  ]
+  "updated_at": "2026-11-18 01:06:08 (CST)",
+  "total_scanned": 0,
+  "results": []
 }
