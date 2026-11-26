@@ -1,0 +1,105 @@
+{
+  "updated_at": "2026-11-27 01:55:06 (CST)",
+  "total_scanned": 3,
+  "results": [
+    {
+      "ticker": "5202.TWO",
+      "name": "力新",
+      "close": 17.6,
+      "volume": 10759,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 17.54,
+        "pullback_ratio": 20.9,
+        "stop_loss": 14.13
+      },
+      "reversal": null,
+      "chart_history": [
+        16.65,
+        18.3,
+        20.1,
+        19.2,
+        21.1,
+        19.4,
+        20.35,
+        20.4,
+        18.55,
+        18.0,
+        16.5,
+        15.65,
+        15.2,
+        16.7,
+        17.6
+      ]
+    },
+    {
+      "ticker": "6140.TWO",
+      "name": "訊達",
+      "close": 32.7,
+      "volume": 8002,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 26.88,
+        "pullback_ratio": 11.26,
+        "stop_loss": 24.38
+      },
+      "reversal": null,
+      "chart_history": [
+        23.5,
+        22.7,
+        21.75,
+        23.9,
+        26.25,
+        28.85,
+        31.7,
+        34.85,
+        31.4,
+        30.1,
+        27.45,
+        29.6,
+        27.5,
+        29.75,
+        32.7
+      ]
+    },
+    {
+      "ticker": "6708.TWO",
+      "name": "天擎",
+      "close": 76.5,
+      "volume": 2301,
+      "strategies": [
+        "PULLBACK_BUY"
+      ],
+      "vcp": null,
+      "pullback": {
+        "support_ma20": 74.64,
+        "pullback_ratio": 23.27,
+        "stop_loss": 60.77
+      },
+      "reversal": null,
+      "chart_history": [
+        75.7,
+        68.2,
+        75.0,
+        82.5,
+        90.7,
+        81.7,
+        89.8,
+        93.1,
+        83.8,
+        76.1,
+        68.5,
+        61.7,
+        67.8,
+        74.5,
+        76.5
+      ]
+    }
+  ]
+}
