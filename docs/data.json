@@ -1,104 +1,71 @@
 {
-  "updated_at": "2026-11-27 01:55:06 (CST)",
-  "total_scanned": 3,
+  "updated_at": "2026-11-28 01:39:33 (CST)",
+  "total_scanned": 2,
   "results": [
     {
-      "ticker": "5202.TWO",
-      "name": "力新",
-      "close": 17.6,
-      "volume": 10759,
+      "ticker": "3491.TWO",
+      "name": "昇達科",
+      "close": 1380.0,
+      "volume": 878,
       "strategies": [
         "PULLBACK_BUY"
       ],
       "vcp": null,
       "pullback": {
-        "support_ma20": 17.54,
-        "pullback_ratio": 20.9,
-        "stop_loss": 14.13
+        "support_ma20": 1317.25,
+        "pullback_ratio": 12.93,
+        "stop_loss": 1088.42
       },
       "reversal": null,
       "chart_history": [
-        16.65,
-        18.3,
-        20.1,
-        19.2,
-        21.1,
-        19.4,
-        20.35,
-        20.4,
-        18.55,
-        18.0,
-        16.5,
-        15.65,
-        15.2,
-        16.7,
-        17.6
+        1085.0,
+        1190.0,
+        1305.0,
+        1435.0,
+        1455.0,
+        1430.0,
+        1405.0,
+        1445.0,
+        1510.0,
+        1360.0,
+        1225.0,
+        1260.0,
+        1385.0,
+        1255.0,
+        1380.0
       ]
     },
     {
-      "ticker": "6140.TWO",
-      "name": "訊達",
-      "close": 32.7,
-      "volume": 8002,
+      "ticker": "5490.TWO",
+      "name": "同亨",
+      "close": 25.5,
+      "volume": 379,
       "strategies": [
         "PULLBACK_BUY"
       ],
       "vcp": null,
       "pullback": {
-        "support_ma20": 26.88,
-        "pullback_ratio": 11.26,
-        "stop_loss": 24.38
+        "support_ma20": 25.51,
+        "pullback_ratio": 10.84,
+        "stop_loss": 23.1
       },
       "reversal": null,
       "chart_history": [
-        23.5,
-        22.7,
-        21.75,
-        23.9,
+        25.6,
+        27.1,
+        28.25,
+        27.85,
+        27.05,
+        27.3,
+        26.35,
         26.25,
-        28.85,
-        31.7,
-        34.85,
-        31.4,
-        30.1,
-        27.45,
-        29.6,
-        27.5,
-        29.75,
-        32.7
-      ]
-    },
-    {
-      "ticker": "6708.TWO",
-      "name": "天擎",
-      "close": 76.5,
-      "volume": 2301,
-      "strategies": [
-        "PULLBACK_BUY"
-      ],
-      "vcp": null,
-      "pullback": {
-        "support_ma20": 74.64,
-        "pullback_ratio": 23.27,
-        "stop_loss": 60.77
-      },
-      "reversal": null,
-      "chart_history": [
-        75.7,
-        68.2,
-        75.0,
-        82.5,
-        90.7,
-        81.7,
-        89.8,
-        93.1,
-        83.8,
-        76.1,
-        68.5,
-        61.7,
-        67.8,
-        74.5,
-        76.5
+        26.75,
+        25.15,
+        23.5,
+        24.15,
+        26.0,
+        24.95,
+        25.5
       ]
     }
   ]
